@@ -6,6 +6,8 @@ export default function Showreel() {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [mediaMeta, setMediaMeta] = useState(null); // { orientation: 'landscape' | 'portrait', ratio }
+  const [modalImage, setModalImage] = useState(null); // project shown in the full-screen modal
 
   const videoRefs = useRef({});
   const filmstripRef = useRef(null);
@@ -16,18 +18,36 @@ export default function Showreel() {
 
   useEffect(() => {
     const onKeyDown = (e) => {
+      if (e.key === "Escape" && modalImage) {
+        setModalImage(null);
+        return;
+      }
+      if (modalImage) return; // don't navigate the reel while the modal is open
       if (e.key === "ArrowRight") goTo(activeIndex + 1);
       if (e.key === "ArrowLeft") goTo(activeIndex - 1);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeIndex, projects.length]);
+  }, [activeIndex, projects.length, modalImage]);
+
+  // Lock body scroll while the image modal is open
+  useEffect(() => {
+    document.body.style.overflow = modalImage ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [modalImage]);
 
   // Keep the active thumbnail scrolled into view
   useEffect(() => {
     const el = filmstripRef.current?.children?.[activeIndex];
     if (el) el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeIndex]);
+
+  // Reset the known media dimensions whenever the active slide changes
+  useEffect(() => {
+    setMediaMeta(null);
   }, [activeIndex]);
 
   const fetchProjects = async () => {
@@ -74,6 +94,15 @@ export default function Showreel() {
     }
   };
 
+  const handleLoadedMetadata = (e) => {
+    const { videoWidth, videoHeight } = e.target;
+    if (!videoWidth || !videoHeight) return;
+    setMediaMeta({
+      orientation: videoWidth >= videoHeight ? "landscape" : "portrait",
+      ratio: videoWidth / videoHeight,
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
@@ -101,6 +130,7 @@ export default function Showreel() {
 
   const active = projects[activeIndex];
   const isVideo = active.is_video;
+  const isPortraitVideo = isVideo && mediaMeta?.orientation === "portrait";
 
   return (
     <section className="relative flex h-screen flex-col bg-black">
@@ -130,8 +160,18 @@ export default function Showreel() {
       </div>
 
       {/* Main stage */}
-      <div className="relative mt-6 flex-1 overflow-hidden px-6 md:px-12">
-        <div className="relative h-full w-full overflow-hidden rounded-xl bg-white/5">
+      <div className="relative mt-6 flex flex-1 items-center justify-center overflow-hidden px-6 md:px-12">
+        {/* Media wrapper: sizing behavior depends on type + orientation */}
+        <div
+          className={`relative h-full overflow-hidden rounded-xl bg-white/5 ${
+            !isVideo
+              ? "w-full cursor-zoom-in"
+              : isPortraitVideo
+              ? "mx-auto w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px]"
+              : "w-full"
+          }`}
+          onClick={!isVideo ? () => setModalImage(active) : undefined}
+        >
           {!isVideo ? (
             <img
               key={active.id}
@@ -144,7 +184,8 @@ export default function Showreel() {
               key={active.id}
               ref={(el) => (videoRefs.current[active.id] = el)}
               src={mediaUrl(active)}
-              className="h-full w-full object-cover"
+              onLoadedMetadata={handleLoadedMetadata}
+              className="h-full w-full object-contain"
               controls={isPlaying}
               preload="metadata"
               playsInline
@@ -152,8 +193,19 @@ export default function Showreel() {
             />
           )}
 
-          {/* Bottom gradient for legible text */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/90 to-transparent" />
+          {/* Bottom gradient for legible text (images + landscape video only, portrait video keeps its own frame clean) */}
+          {!isPortraitVideo && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/90 to-transparent" />
+          )}
+
+          {/* Expand hint for images */}
+          {!isVideo && (
+            <div className="pointer-events-none absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+              </svg>
+            </div>
+          )}
 
           {/* Play button for video */}
           {isVideo && !isPlaying && (
@@ -170,38 +222,54 @@ export default function Showreel() {
             </button>
           )}
 
-          {/* Prev / Next arrows */}
-          <button
-            onClick={() => goTo(activeIndex - 1)}
-            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-white hover:bg-black/60 md:left-5"
-            aria-label="Previous project"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button
-            onClick={() => goTo(activeIndex + 1)}
-            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-white hover:bg-black/60 md:right-5"
-            aria-label="Next project"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          {/* Title overlay (skip on portrait video, shown below the frame instead) */}
+          {!isPortraitVideo && (
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-5 md:p-8">
+              <h2 className="amc-display text-xl font-semibold tracking-tight text-white md:text-3xl">
+                {active.title}
+              </h2>
+              {active.description && (
+                <p className="amc-body mt-1 max-w-lg text-xs text-white/60 md:text-sm">
+                  {active.description}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
 
-          {/* Title overlay */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-5 md:p-8">
-            <h2 className="amc-display text-xl font-semibold tracking-tight text-white md:text-3xl">
+        {/* Title block for portrait video, shown outside the frame */}
+        {isPortraitVideo && (
+          <div className="pointer-events-none absolute bottom-6 left-0 right-0 px-6 text-center md:px-12">
+            <h2 className="amc-display text-lg font-semibold tracking-tight text-white md:text-2xl">
               {active.title}
             </h2>
             {active.description && (
-              <p className="amc-body mt-1 max-w-lg text-xs text-white/60 md:text-sm">
+              <p className="amc-body mx-auto mt-1 max-w-md text-xs text-white/60 md:text-sm">
                 {active.description}
               </p>
             )}
           </div>
-        </div>
+        )}
+
+        {/* Prev / Next arrows */}
+        <button
+          onClick={() => goTo(activeIndex - 1)}
+          className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-white hover:bg-black/60 md:left-5"
+          aria-label="Previous project"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => goTo(activeIndex + 1)}
+          className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-white hover:bg-black/60 md:right-5"
+          aria-label="Next project"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       {/* Filmstrip */}
@@ -239,6 +307,44 @@ export default function Showreel() {
             </span>
           </button>
         ))}
+      </div>
+
+      {/* Full-screen blurred modal for images */}
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-2xl transition-opacity duration-300 ${
+          modalImage ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setModalImage(null)}
+      >
+        {modalImage && (
+          <>
+            <button
+              onClick={() => setModalImage(null)}
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-white hover:bg-black/60"
+              aria-label="Close preview"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+
+            <img
+              src={mediaUrl(modalImage)}
+              alt={modalImage.title}
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-[85vh] max-w-[90vw] object-contain shadow-2xl"
+            />
+
+            <div
+              className="pointer-events-none absolute bottom-8 left-0 right-0 px-6 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="amc-display text-lg font-semibold tracking-tight text-white">
+                {modalImage.title}
+              </h3>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
