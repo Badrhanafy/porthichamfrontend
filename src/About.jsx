@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
-const SPECIALTIES = ["Cinematography", "Portraiture", "Color Grade", "Directing"];
+
 
 export default function About() {
   const [isVisible, setIsVisible] = useState(false);
@@ -24,52 +25,45 @@ export default function About() {
   return (
     <section
       ref={sectionRef}
-      className="flex h-screen sm:mt-20 items-center justify-center bg-black px-6 md:px-12"
+      className="flex h-screen items-center justify-center bg-black px-6 sm:mt-20 md:px-12"
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
-        .amc-display { font-family: 'Bebas Neue', 'Inter', sans-serif; }
-        .amc-mono { font-family: 'Space Mono', monospace; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        .amc-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
         .amc-body { font-family: 'Inter', sans-serif; }
+        .amc-label { font-family: 'Space Grotesk', 'Inter', sans-serif; }
       `}</style>
 
-      <div className="mx-auto grid w-full max-w-4xl items-center gap-3 md:grid-cols-2 md:gap-12">
+      <div className="mx-auto grid w-full max-w-4xl border-2 border-yellow-200 items-center gap-10 md:grid-cols-2 md:gap-14">
         {/* Text first on mobile */}
         <div
-          className={`order-1 transition-all duration-1000 delay-200 ${
+          className={`order-1 flex flex-col gap-4 border-l pl-6 border-yellow-400 transition-all duration-1000 delay-200 ${
             isVisible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
           } md:order-2`}
         >
-          <p className="amc-mono mb-3 text-xs uppercase tracking-[0.35em] text-[#8a8378]">
-            About
-          </p>
+          <div>
+            
 
-          <h2 className="amc-display text-[2.6rem] leading-[0.95] tracking-wide text-[#f3efe6] sm:text-[3.2rem]">
-            BEHIND
-            <span className="block text-[#c9a15a]">THE LENS</span>
-          </h2>
+            <h2 className="amc-display text-[2.6rem] font-semibold leading-[1] tracking-tight text-white sm:text-[3.2rem]">
+              Behind
+              <span className="block text-white/50">the lens</span>
+            </h2>
+          </div>
 
-          <p className="amc-body mt-4 max-w-md text-[14px] leading-relaxed text-[#a39a8d]">
+          <p className="amc-body max-w-md text-[14px] leading-relaxed text-white/60">
             I'm a photographer and filmmaker who treats every frame like a
             single exposure worth getting right — composing light, motion,
             and story into images that hold up long after the shutter
             closes.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {SPECIALTIES.map((skill) => (
-              <span
-                key={skill}
-                className="amc-mono cursor-default border border-[#c9a15a]/25 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-[#a39a8d] transition-all duration-300 hover:border-[#c9a15a] hover:text-[#e8c880]"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
+          <div className="h-px w-12 bg-white/20" />
 
-          <div className="mt-7">
-            <button className="group relative flex items-center gap-2 overflow-hidden border border-[#c9a15a] px-6 py-3 text-[#c9a15a] transition-colors duration-300 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c9a15a]">
-              <span className="amc-mono relative z-10 flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
+      
+
+          <div>
+            <Link to={'/works'} className="group relative flex items-center gap-2 overflow-hidden border border-white bg-white px-6 py-3 text-black transition-colors duration-300 hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+              <span className="amc-label relative z-10 flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
                 <svg
                   className="h-3 w-3"
                   viewBox="0 0 24 24"
@@ -80,8 +74,7 @@ export default function About() {
                 </svg>
                 View Showreel
               </span>
-              <div className="absolute inset-0 -z-0 origin-left scale-x-0 bg-[#c9a15a] transition-transform duration-500 ease-out group-hover:scale-x-100" />
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -91,14 +84,15 @@ export default function About() {
             isVisible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"
           } md:order-1`}
         >
-          <img
-            src="/profile.jpeg"
-            alt="Portrait of the photographer and filmmaker"
-            className="h-[280px]  w-full max-w-[260px] object-cover md:h-[340px]"
-          />
+          <div className="relative h-[280px] w-full max-w-[260px] overflow-hidden md:h-[340px]">
+            <img
+              src="/profile.jpeg"
+              alt="Portrait of the photographer and filmmaker"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-[10%] bg-gradient-to-t from-black/90 to-transparent" />
+          </div>
         </div>
-
-
       </div>
     </section>
   );

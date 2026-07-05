@@ -11,6 +11,7 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Contact from "./Contact";
 import Footer from "./Footer";
+import Showreel from "./Showreel";
 
 function HomePage() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/category/:slug" element={<CategoryProjects />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/Contact" element={<Contact />} />
+            <Route path="/works" element={<Showreel />} />
           </Routes>
         </div>
         <Footer/>
