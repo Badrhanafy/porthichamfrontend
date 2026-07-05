@@ -41,7 +41,7 @@ export default function About() {
           }`}
         >
           <img
-            src="/photopng.png"
+            src="/profile/jpeg"
             alt="Portrait of the photographer and filmmaker"
             className="h-[280px] w-full max-w-[260px] object-cover md:h-[340px]"
           />
