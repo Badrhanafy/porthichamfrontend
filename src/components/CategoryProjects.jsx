@@ -10,6 +10,7 @@ export default function CategoryProjects() {
   const [category, setCategory] = useState(null);
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState(null);
@@ -41,6 +42,7 @@ export default function CategoryProjects() {
           setCategory(null);
           setImages([]);
           setVideos([]);
+          setAllProjects([]);
           return;
         }
 
@@ -53,6 +55,7 @@ export default function CategoryProjects() {
 
         setImages(filtered.filter((p) => !p.is_video));
         setVideos(filtered.filter((p) => p.is_video));
+        setAllProjects(filtered);
       } catch (err) {
         console.error(err);
         if (!cancelled) setError("Something went wrong loading this category.");
@@ -173,69 +176,59 @@ export default function CategoryProjects() {
                 </p>
               </div>
             ) : (
-              <>
-                {/* Images Grid */}
-                {images.length > 0 && (
-                  <div className="mb-20 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2">
-                    {images.map((p) => (
-                      <div key={p.id}>
-                        <button
-                          onClick={() => setModalImage(p)}
-                          className="group relative block w-full cursor-zoom-in overflow-hidden"
+              <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2">
+                {allProjects.map((p) =>
+                  p.is_video ? (
+                    <div key={p.id} className="relative">
+                      {!playingStates[p.id] && (
+                        <div
+                          onClick={() => handleManualPlay(p.id)}
+                          className="group absolute inset-0 z-10 flex cursor-pointer items-center justify-center bg-black/20"
                         >
-                          <img
-                            src={mediaUrl(p)}
-                            alt={p.title}
-                            className="h-auto w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                          <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
-                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+                          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-2xl transition-transform group-hover:scale-110">
+                            <svg className="ml-1 h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
                             </svg>
                           </div>
-                        </button>
-                        <h3 className="amc-display mt-4 font-semibold text-white">{p.title}</h3>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        </div>
+                      )}
 
-                {/* Videos Grid */}
-                {videos.length > 0 && (
-                  <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2">
-                    {videos.map((p) => (
-                      <div key={p.id} className="relative">
-                        {!playingStates[p.id] && (
-                          <div
-                            onClick={() => handleManualPlay(p.id)}
-                            className="group absolute inset-0 z-10 flex cursor-pointer items-center justify-center bg-black/20"
-                          >
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-2xl transition-transform group-hover:scale-110">
-                              <svg className="ml-1 h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
+                      <video
+                        ref={(el) => (videoRefs.current[p.id] = el)}
+                        controls
+                        onPlay={() => setPlayingStates((prev) => ({ ...prev, [p.id]: true }))}
+                        onPause={() => setPlayingStates((prev) => ({ ...prev, [p.id]: false }))}
+                        className="h-auto w-full bg-black"
+                        src={mediaUrl(p)}
+                        preload="metadata"
+                        playsInline
+                      />
 
-                        <video
-                          ref={(el) => (videoRefs.current[p.id] = el)}
-                          controls
-                          onPlay={() => setPlayingStates((prev) => ({ ...prev, [p.id]: true }))}
-                          onPause={() => setPlayingStates((prev) => ({ ...prev, [p.id]: false }))}
-                          className="h-auto w-full bg-black"
+                      <h3 className="amc-display mt-4 font-semibold text-white">{p.title}</h3>
+                    </div>
+                  ) : (
+                    <div key={p.id}>
+                      <button
+                        onClick={() => setModalImage(p)}
+                        className="group relative block w-full cursor-zoom-in overflow-hidden"
+                      >
+                        <img
                           src={mediaUrl(p)}
-                          preload="metadata"
-                          playsInline
+                          alt={p.title}
+                          className="h-auto w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy"
                         />
-
-                        <h3 className="amc-display mt-4 font-semibold text-white">{p.title}</h3>
-                      </div>
-                    ))}
-                  </div>
+                        <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+                          </svg>
+                        </div>
+                      </button>
+                      <h3 className="amc-display mt-4 font-semibold text-white">{p.title}</h3>
+                    </div>
+                  )
                 )}
-              </>
+              </div>
             )}
           </>
         )}
