@@ -33,7 +33,7 @@ export default function About() {
         .amc-body { font-family: 'Inter', sans-serif; }
       `}</style>
 
-      <div className="mx-auto grid w-full max-w-4xl items-center gap-10 md:grid-cols-2 md:gap-12">
+      <div className="mx-auto grid w-full max-w-4xl items-center gap-3 md:grid-cols-2 md:gap-12">
         {/* Image */}
         <div
           className={`flex justify-center transition-all duration-1000 ${
@@ -41,9 +41,9 @@ export default function About() {
           }`}
         >
           <img
-            src="/profile/jpeg"
+            src="/profile.jpeg"
             alt="Portrait of the photographer and filmmaker"
-            className="h-[280px] w-full max-w-[260px] object-cover md:h-[340px]"
+            className="h-[280px]  w-full max-w-[260px] object-cover md:h-[340px]"
           />
         </div>
 
