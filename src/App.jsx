@@ -25,10 +25,10 @@ function HomePage() {
 function App() {
   return (
     <BrowserRouter>
-      <div className="bg-[#191919] min-h-screen">
+      <div className="bg-[#191919] ">
         <Navbar />
 
-        <div className="mt-16">
+        <div className="">
           <Routes>
             {/* Admin routes */}
             <Route path="/admin" element={<AdminLayout />}>

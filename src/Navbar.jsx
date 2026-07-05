@@ -56,7 +56,7 @@ export default function Navbar() {
         }`}
       >
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="relative flex h-16 items-center justify-between md:h-20">
+          <div className="relative flex h-16 items-center justify-between overflow-hidden md:h-20">
             {/* LEFT LINKS (desktop) */}
             <div className="hidden items-center gap-1 md:flex">
               {NAV_LINKS.slice(0, 2).map((link) => (
@@ -70,9 +70,13 @@ export default function Navbar() {
             {/* CENTER LOGO */}
             <a
               href="/"
-              className="absolute left-1/2 flex -translate-x-1/2 transform items-center"
+              className="absolute left-1/2 flex h-full -translate-x-1/2 transform items-center py-2"
             >
-              <img src="/logo.png" alt="" className="w-44 md:w-60" />
+              <img
+                src="/logo.png"
+                alt="El Hachimi Films"
+                className="h-full w-auto max-w-[] object-contain sm:max-w-[180px] md:max-w-[220px]"
+              />
             </a>
 
             {/* RIGHT LINKS (desktop) */}

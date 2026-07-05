@@ -9,7 +9,7 @@ export default function About() {
   }, []);
 
   return (
-    <section className="flex h-screen items-center justify-center bg-black px-6 sm:mt-20 md:px-12">
+    <section className="flex h-screen items-center justify-center bg-black px-6 sm:mt-2 md:px-12">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
         .amc-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
@@ -18,7 +18,7 @@ export default function About() {
 
       <div className="text-center">
         <h2
-          className={`amc-display text-3xl font-semibold uppercase tracking-[0.15em] text-white transition-all duration-1000 ease-out sm:text-4xl md:text-5xl ${
+          className={`amc-display  font-semibold uppercase tracking-[0.15em] text-white transition-all duration-1000 ease-out text-6xl sm:text-4xl md:text-5xl ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
           }`}
         >
@@ -26,7 +26,7 @@ export default function About() {
         </h2>
 
         <p
-          className={`amc-body mt-4 text-sm uppercase tracking-[0.3em] text-white/40 transition-all duration-1000 ease-out delay-200 md:text-base ${
+          className={`amc-body text-sm uppercase tracking-[0.3em] text-white/40 transition-all duration-1000 ease-out delay-200 md:text-base ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
           }`}
         >
