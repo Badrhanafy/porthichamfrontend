@@ -39,7 +39,7 @@ export default function Signup() {
     }
 
     try {
-      const res = await axios.post("http://localhost:8000/api/signup", {
+      const res = await axios.post("http://api.elhachimivisionlab.com/api/signup", {
         name: form.name,
         email: form.email,
         password: form.password,
