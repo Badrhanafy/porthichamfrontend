@@ -17,12 +17,12 @@ export default function CategoryProjects() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const catRes = await axios.get("http://127.0.0.1:8000/api/categories");
+        const catRes = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/categories`);
         const matched = catRes.data.find((c) => toSlug(c.name) === slug);
         if (!matched) return;
         setCategory(matched);
 
-        const projRes = await axios.get("http://127.0.0.1:8000/api/projects");
+        const projRes = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/projects`);
         const filtered = projRes.data.filter((p) => p.category_id === matched.id);
         
         setImages(filtered.filter(p => !p.is_video));
@@ -57,7 +57,7 @@ export default function CategoryProjects() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mb-20">
             {images.map((p) => (
               <div key={p.id}>
-                <img src={p.file_url || `http://127.0.0.1:8000/storage/${p.path}`} alt={p.title} className="w-full h-auto" />
+                <img src={p.file_url || `${import.meta.env.VITE_API_ENDPOINT.replace(/\/api$/, '')}/storage/${p.path}`} alt={p.title} className="w-full h-auto" />
                 <h3 className="text-white font-bold mt-4">{p.title}</h3>
               </div>
             ))}
@@ -88,7 +88,7 @@ export default function CategoryProjects() {
                   onPlay={() => setPlayingStates(prev => ({ ...prev, [p.id]: true }))}
                   onPause={() => setPlayingStates(prev => ({ ...prev, [p.id]: false }))}
                   className="w-full h-auto bg-black"
-                  src={p.file_url || `http://127.0.0.1:8000/storage/${p.path}`}
+                  src={p.file_url || `${import.meta.env.VITE_API_ENDPOINT.replace(/\/api$/, '')}/storage/${p.path}`}
                 />
                 
                 <h3 className="text-white font-bold mt-4">{p.title}</h3>

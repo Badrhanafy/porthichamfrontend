@@ -68,7 +68,7 @@ export default function AddCategory() {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.post("http://127.0.0.1:8000/api/categories", data, {
+      const res = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/categories`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Category created:", res.data);

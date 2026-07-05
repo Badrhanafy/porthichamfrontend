@@ -14,7 +14,7 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/projects");
+      const res = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/projects`);
       setProjects(res.data);
     } catch (err) {
       console.log(err);
@@ -61,7 +61,7 @@ export default function Projects() {
           {!isVideo ? (
             // IMAGE - maintains aspect ratio up to max-height, then crops cleanly
             <img
-              src={project.file_url || `http://127.0.0.1:8000/storage/${project.path}`}
+              src={project.file_url || `${import.meta.env.VITE_API_ENDPOINT.replace(/\/api$/, '')}/storage/${project.path}`}
               alt={project.title}
               className="w-full max-h-[70vh] md:max-h-[550px] object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
@@ -71,7 +71,8 @@ export default function Projects() {
             <>
               <video
                 ref={(el) => (videoRefs.current[project.id] = el)}
-                src={project.file_url || `http://127.0.0.1:8000/storage/${project.path}`}
+                src={project.file_url || `${import.meta.env.VITE_API_ENDPOINT.replace(/\/api$/, '')}/storage/${project.path}`}
+
                 className="w-full max-h-[70vh] md:max-h-[550px] object-cover"
                 controls={isPlaying}
                 preload="metadata"

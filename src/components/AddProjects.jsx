@@ -14,7 +14,7 @@ export default function AddProject() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/categories`);
         setCategories(res.data);
       } catch (err) {
         console.error("Failed to fetch categories", err);
@@ -106,7 +106,7 @@ export default function AddProject() {
       setLoading(true);
       setError("");
 
-      const response = await axios.post("http://127.0.0.1:8000/api/projects", formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/projects`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 300000, // 60 seconds
       });

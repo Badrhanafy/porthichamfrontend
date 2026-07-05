@@ -16,7 +16,7 @@ export default function Categories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/categories");
+      const res = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/categories`);
       setCategories(res.data);
     } catch (err) {
       console.error("Error fetching categories:", err);
@@ -51,7 +51,7 @@ export default function Categories() {
   {categories.map((category) => {
     const slug = toSlug(category.name);
     const imageUrl = category.coverpath
-      ? `http://127.0.0.1:8000/storage/${category.coverpath}`
+      ? `${import.meta.env.VITE_API_ENDPOINT.replace(/\/api$/, '')}/storage/${category.coverpath}`
       : null;
 
     return (

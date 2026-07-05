@@ -1,48 +1,99 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+const SPECIALTIES = ["Cinematography", "Portraiture", "Color Grade", "Directing"];
 
 export default function About() {
-  return (
-    <section className="min-h-screen bg-[#0b0908] flex items-center px-6 md:px-12 py-20">
-      <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center">
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="flex h-screen items-center justify-center bg-black px-6 md:px-12"
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+        .amc-display { font-family: 'Bebas Neue', 'Inter', sans-serif; }
+        .amc-mono { font-family: 'Space Mono', monospace; }
+        .amc-body { font-family: 'Inter', sans-serif; }
+      `}</style>
+
+      <div className="mx-auto grid w-full max-w-4xl items-center gap-10 md:grid-cols-2 md:gap-12">
         {/* Image */}
-        <div className="flex justify-center">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/5  p-2">
-            <img
-              src="/photopng.png"
-              alt="Profile"
-              className="w-full h-[450px] object-cover rounded-xl"
-            />
-          </div>
+        <div
+          className={`flex justify-center transition-all duration-1000 ${
+            isVisible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"
+          }`}
+        >
+          <img
+            src="/photopng.png"
+            alt="Portrait of the photographer and filmmaker"
+            className="h-[280px] w-full max-w-[260px] object-cover md:h-[340px]"
+          />
         </div>
 
-        {/* Text */}
-        <div className="space-y-6">
-          <div>
-            <p className="text-white/40 uppercase tracking-[0.25em] text-xs mb-3">
-              About Me
-            </p>
+        {/* Text content */}
+        <div
+          className={`transition-all duration-1000 delay-200 ${
+            isVisible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
+          }`}
+        >
+          <p className="amc-mono mb-3 text-xs uppercase tracking-[0.35em] text-[#8a8378]">
+            About
+          </p>
 
-            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
-              Creating modern digital experiences
-            </h2>
+          <h2 className="amc-display text-[2.6rem] leading-[0.95] tracking-wide text-[#f3efe6] sm:text-[3.2rem]">
+            BEHIND
+            <span className="block text-[#c9a15a]">THE LENS</span>
+          </h2>
+
+          <p className="amc-body mt-4 max-w-md text-[14px] leading-relaxed text-[#a39a8d]">
+            I'm a photographer and filmmaker who treats every frame like a
+            single exposure worth getting right — composing light, motion,
+            and story into images that hold up long after the shutter
+            closes.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {SPECIALTIES.map((skill) => (
+              <span
+                key={skill}
+                className="amc-mono cursor-default border border-[#c9a15a]/25 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-[#a39a8d] transition-all duration-300 hover:border-[#c9a15a] hover:text-[#e8c880]"
+              >
+                {skill}
+              </span>
+            ))}
           </div>
 
-          <p className="text-white/60 leading-relaxed text-base md:text-lg max-w-lg">
-            I am a passionate web developer focused on building modern,
-            responsive, and user-friendly digital experiences. My goal is to
-            combine clean design with powerful functionality.
-          </p>
-
-          <p className="text-white/40 leading-relaxed text-sm md:text-base max-w-lg">
-            I work with technologies like React, Laravel, and modern UI systems
-            to create scalable and professional web applications.
-          </p>
-
-          {/* Button */}
-          <div className="pt-2">
-            <button className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-black hover:text-white border border-white transition-all duration-300">
-              View Projects
+          <div className="mt-7">
+            <button className="group relative flex items-center gap-2 overflow-hidden border border-[#c9a15a] px-6 py-3 text-[#c9a15a] transition-colors duration-300 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c9a15a]">
+              <span className="amc-mono relative z-10 flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
+                <svg
+                  className="h-3 w-3"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                View Showreel
+              </span>
+              <div className="absolute inset-0 -z-0 origin-left scale-x-0 bg-[#c9a15a] transition-transform duration-500 ease-out group-hover:scale-x-100" />
             </button>
           </div>
         </div>
