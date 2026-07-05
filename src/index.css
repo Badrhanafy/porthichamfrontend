@@ -140,3 +140,21 @@
     display: none;
   }
 }
+@font-face {
+  font-family: "font1";
+  src: url("/public/fonts/ClashGrotesk-Bold.otf") format("opentype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "font1light";
+  src: url("/public/fonts//ClashDisplay-light.otf") format("opentype");
+  font-display: swap;
+}
+
+/* Used in About.jsx */
+.text {
+  font-family: "font1";
+}
+.textlight{
+  font-family: "font1light";
+}

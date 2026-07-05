@@ -11,26 +11,25 @@ export default function About() {
   return (
     <section className="flex h-screen items-center justify-center bg-black px-6 sm:mt-2 md:px-12">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
-        .amc-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
-        .amc-body { font-family: 'Inter', sans-serif; }
+       
       `}</style>
 
-      <div className="text-center">
+      <div className="text-center text ">
         <h2
-          className={`amc-display  font-semibold uppercase tracking-[0.15em] text-white transition-all duration-1000 ease-out text-6xl sm:text-4xl md:text-5xl ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+          className={`  text  uppercase tracking-[0.05em] text-white transition-all duration-1000 ease-out text-6xl sm:text-4xl md:text-5xl ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
           }`}
         >
           El Hachimi Films
         </h2>
 
+        
         <p
-          className={`amc-body text-sm uppercase tracking-[0.3em] text-white/40 transition-all duration-1000 ease-out delay-200 md:text-base ${
+          className={`textlight text-sm uppercase tracking-[0.3em] text-white/80 transition-all duration-1000 ease-out delay-200 md:text-base ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
           }`}
         >
-          Behind the lens
+          Elevating brands through refined visuals that combine creativity, emotion, and precision. Every frame is crafted to communicate your story with elegance and purpose.
         </p>
       </div>
     </section>
