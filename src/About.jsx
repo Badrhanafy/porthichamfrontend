@@ -34,10 +34,10 @@ export default function About() {
         .amc-label { font-family: 'Space Grotesk', 'Inter', sans-serif; }
       `}</style>
 
-      <div className="mx-auto grid w-full max-w-4xl border-2 border-yellow-200 items-center gap-10 md:grid-cols-2 md:gap-14">
+      <div className="mx-auto grid w-full max-w-4xl items-center gap-6 md:grid-cols-2 md:gap-6">
         {/* Text first on mobile */}
         <div
-          className={`order-1 flex flex-col gap-4 border-l pl-6 border-yellow-400 transition-all duration-1000 delay-200 ${
+          className={`order-1 flex flex-col gap-4 border-l pl-6 transition-all duration-1000 delay-200 ${
             isVisible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
           } md:order-2`}
         >
@@ -62,7 +62,7 @@ export default function About() {
       
 
           <div>
-            <Link to={'/works'} className="group relative flex items-center gap-2 overflow-hidden border border-white bg-white px-6 py-3 text-black transition-colors duration-300 hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <Link to={'/works'} className="group w-1/2 relative flex items-center gap-2 overflow-hidden border border-white bg-white px-6 py-3 text-black transition-colors duration-300 hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
               <span className="amc-label relative z-10 flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
                 <svg
                   className="h-3 w-3"
