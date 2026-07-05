@@ -25,11 +25,12 @@ export default function About() {
 
         
         <p
-          className={`textlight text-sm uppercase tracking-[0.3em] text-white/80 transition-all duration-1000 ease-out delay-200 md:text-base ${
+          className={`textlight text-sm w-[130vh]  tracking-[0.1em] text-white/80 transition-all duration-1000 ease-out delay-200 md:text-base ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
           }`}
         >
-          Elevating brands through refined visuals that combine creativity, emotion, and precision. Every frame is crafted to communicate your story with elegance and purpose.
+          Elevating brands through refined visuals that combine 
+          creativity, emotion, and precision. Every frame is crafted to communicate your story with elegance and purpose.
         </p>
       </div>
     </section>
