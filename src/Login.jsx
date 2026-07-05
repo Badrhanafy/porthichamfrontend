@@ -1,16 +1,20 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Signup() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
-    remember: false,
+    password_confirmation: "",
+    agree: false,
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,27 +29,52 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+
+    // Validate password match
+    if (form.password !== form.password_confirmation) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await axios.post("http://localhost:8000/api/login", {
+      const res = await axios.post("http://localhost:8000/api/signup", {
+        name: form.name,
         email: form.email,
         password: form.password,
+        password_confirmation: form.password_confirmation,
       });
 
+      // Handle successful signup
       const token = res.data.token;
-
-      localStorage.setItem("token", token);
-
-      console.log("Login success:", res.data);
-
-      window.location.href = "/admin";
+      if (token) {
+        localStorage.setItem("token", token);
+        console.log("Signup success:", res.data);
+        setSuccess("Account created successfully!");
+        
+        // Redirect to admin or login after short delay
+        setTimeout(() => {
+          navigate("/admin");
+        }, 1500);
+      } else {
+        // If no token, redirect to login
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Signup error:", err);
 
-      if (err.response?.data?.message) {
+      if (err.response?.data?.errors) {
+        // Handle validation errors
+        const errors = err.response.data.errors;
+        const errorMessages = Object.values(errors).flat().join(" ");
+        setError(errorMessages);
+      } else if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
-        setError("Invalid credentials or server error.");
+        setError("Signup failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -53,10 +82,10 @@ export default function Login() {
   };
 
   return (
-    <section className="min-h-screen bg-[#0b0908] flex items-center justify-center px-4 sm:px-6">
+    <section className="min-h-screen bg-[#0b0908] flex items-center justify-center px-4 sm:px-6 py-8">
       <div className="w-full max-w-md">
 
-        {/* Login Card */}
+        {/* Signup Card */}
         <div className="relative bg-[#111111] border border-white/5 rounded-3xl p-8 md:p-10 overflow-hidden">
 
           {/* Background Glow */}
@@ -66,17 +95,24 @@ export default function Login() {
           {/* Header */}
           <div className="relative z-10 text-center mb-8">
             <p className="text-[11px] uppercase tracking-[0.35em] text-white/30 mb-3">
-              Secure Access
+              Get Started
             </p>
 
             <h1 className="text-3xl md:text-4xl font-bold text-white">
-              Admin Login
+              Create Account
             </h1>
 
             <p className="text-white/40 text-sm mt-3 max-w-xs mx-auto">
-              Sign in to manage your projects and categories
+              Join us to manage your projects and categories
             </p>
           </div>
+
+          {/* Success Message */}
+          {success && (
+            <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-400 text-sm p-3 rounded-xl">
+              {success}
+            </div>
+          )}
 
           {/* Error */}
           {error && (
@@ -87,6 +123,23 @@ export default function Login() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+
+            {/* Name */}
+            <div>
+              <label className="block text-sm text-white/60 mb-2">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="John Doe"
+                required
+                className="w-full bg-[#0b0908] border border-white/5 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 focus:bg-black transition-all duration-300"
+              />
+            </div>
 
             {/* Email */}
             <div>
@@ -118,31 +171,47 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="••••••••"
                 required
+                minLength={8}
                 className="w-full bg-[#0b0908] border border-white/5 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 focus:bg-black transition-all duration-300"
               />
             </div>
 
-            {/* Remember + Forgot */}
-            <div className="flex items-center justify-between text-sm">
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm text-white/60 mb-2">
+                Confirm Password
+              </label>
+
+              <input
+                type="password"
+                name="password_confirmation"
+                value={form.password_confirmation}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                className="w-full bg-[#0b0908] border border-white/5 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 focus:bg-black transition-all duration-300"
+              />
+            </div>
+
+            {/* Agree to Terms */}
+            <div className="flex items-center gap-2 text-sm">
               <label className="flex items-center gap-2 text-white/40 cursor-pointer">
                 <input
                   type="checkbox"
-                  name="remember"
-                  checked={form.remember}
+                  name="agree"
+                  checked={form.agree}
                   onChange={handleChange}
+                  required
                   className="accent-white"
                 />
-                Remember me
+                I agree to the{" "}
+                <button
+                  type="button"
+                  className="text-white/60 hover:text-white transition"
+                >
+                  Terms & Conditions
+                </button>
               </label>
-
-              <button
-                type="button"
-                className="text-white/30 hover:text-white transition"
-              >
-                Forgot?
-              </button>
-              
-              <Link to="/signup">Sign Up</Link>
             </div>
 
             {/* Submit */}
@@ -151,8 +220,19 @@ export default function Login() {
               disabled={loading}
               className="w-full py-3 rounded-xl bg-white text-black font-semibold border border-white transition-all duration-300 hover:bg-black hover:text-white disabled:opacity-50"
             >
-              {loading ? "Signing in..." : "Login"}
+              {loading ? "Creating account..." : "Sign Up"}
             </button>
+
+            {/* Login Link */}
+            <div className="text-center text-sm text-white/40">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-white/60 hover:text-white transition"
+              >
+                Login
+              </Link>
+            </div>
           </form>
         </div>
       </div>
