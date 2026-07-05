@@ -86,11 +86,11 @@ export default function Navbar() {
             </div>
 
             {/* MOBILE TOGGLE — animated hamburger / close morph */}
-            <div className="flex items-center md:hidden">
+            <div className="ml-auto flex items-center md:hidden">
               <button
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
-                className="relative start-96 ml-6 z-[60] inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#c9a15a]/25 bg-white/5 text-white/80 transition hover:border-[#c9a15a]/50"
+                className="relative z-[60] inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#c9a15a]/25 bg-white/5 text-white/80 transition hover:border-[#c9a15a]/50"
                 aria-expanded={menuOpen}
                 aria-controls="mobile-nav"
               >
