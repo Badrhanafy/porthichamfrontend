@@ -24,7 +24,7 @@ export default function About() {
   return (
     <section
       ref={sectionRef}
-      className="flex h-screen items-center justify-center bg-black px-6 md:px-12"
+      className="flex h-screen sm:mt-20 items-center justify-center bg-black px-6 md:px-12"
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
@@ -34,24 +34,11 @@ export default function About() {
       `}</style>
 
       <div className="mx-auto grid w-full max-w-4xl items-center gap-3 md:grid-cols-2 md:gap-12">
-        {/* Image */}
+        {/* Text first on mobile */}
         <div
-          className={`flex justify-center transition-all duration-1000 ${
-            isVisible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"
-          }`}
-        >
-          <img
-            src="/profile.jpeg"
-            alt="Portrait of the photographer and filmmaker"
-            className="h-[280px]  w-full max-w-[260px] object-cover md:h-[340px]"
-          />
-        </div>
-
-        {/* Text content */}
-        <div
-          className={`transition-all duration-1000 delay-200 ${
+          className={`order-1 transition-all duration-1000 delay-200 ${
             isVisible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
-          }`}
+          } md:order-2`}
         >
           <p className="amc-mono mb-3 text-xs uppercase tracking-[0.35em] text-[#8a8378]">
             About
@@ -97,6 +84,21 @@ export default function About() {
             </button>
           </div>
         </div>
+
+        {/* Image */}
+        <div
+          className={`order-2 flex justify-center transition-all duration-1000 ${
+            isVisible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"
+          } md:order-1`}
+        >
+          <img
+            src="/profile.jpeg"
+            alt="Portrait of the photographer and filmmaker"
+            className="h-[280px]  w-full max-w-[260px] object-cover md:h-[340px]"
+          />
+        </div>
+
+
       </div>
     </section>
   );

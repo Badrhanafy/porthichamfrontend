@@ -46,8 +46,8 @@ export default function Categories() {
         )}
 
         {categories.length > 0 ? (
-          /* Strict 2-column grid with gap-1 and no outer borders on the cards */
-<div className="grid grid-cols-2 gap-4 ">
+          /* Responsive grid: 1 card per row on mobile, 2 columns on md+ */
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
   {categories.map((category) => {
     const slug = toSlug(category.name);
     const imageUrl = category.coverpath
