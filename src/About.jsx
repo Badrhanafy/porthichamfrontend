@@ -12,7 +12,7 @@ export default function About() {
     <section className="min-h-screen flex items-center justify-center bg-black px-6 sm:px-8 md:px-12">
       <div className="text-center max-w-5xl mx-auto">
         <h2
-          className={`uppercase tracking-[0.05em] text-white font-light transition-all duration-1000 ease-out
+          className={`uppercase font-bold tracking-[0.05em] text-white  transition-all duration-1000 ease-out
           text-3xl sm:text-4xl md:text-5xl lg:text-6xl
           ${
             isVisible
