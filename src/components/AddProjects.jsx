@@ -205,7 +205,7 @@ export default function AddProject() {
                 </svg>
                 <p className="text-sm text-amber-700 dark:text-amber-400">
                   No categories found.{" "}
-                  <a href="/admin/add-category" className="font-semibold underline hover:no-underline">Create a category first</a>.
+                  <a href="/adminspcaeforuploadmediav1_notsecuredatall/add-category" className="font-semibold underline hover:no-underline">Create a category first</a>.
                 </p>
               </div>
             ) : (
