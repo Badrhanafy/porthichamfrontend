@@ -3,12 +3,12 @@ import { NavLink } from "react-router-dom";
 const AdminSidebar = ({ isOpen, onClose }) => {
   const navItems = [
     {
-      path: "/admin/add-project",
+      path: "/adminspcaeforuploadmediav1_notsecuredatall/add-project",
       label: "Add Project",
       icon: "📝",
     },
     {
-      path: "/admin/add-category",
+      path: "/adminspcaeforuploadmediav1_notsecuredatall/add-category",
       label: "Add Category",
       icon: "🏷️",
     },
