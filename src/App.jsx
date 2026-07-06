@@ -31,7 +31,7 @@ function App() {
         <div className="">
           <Routes>
             {/* Admin routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/adminspcaeforuploadmediav1_notsecuredatall" element={<AdminLayout />}>
               <Route index element={<AdminAddProject />} />
               <Route path="add-category" element={<AddCategory />} />
               <Route path="add-project" element={<AdminAddProject />} />
