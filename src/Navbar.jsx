@@ -34,7 +34,7 @@ export default function Navbar() {
   }, [menuOpen]);
 
   const linkClass =
-    "amc-mono group relative px-4 py-2 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors duration-300 hover:text-[#f3efe6]";
+    "amc-mono group relative font-bold px-4 py-2 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors duration-300 hover:text-[#f3efe6]";
 
   const handleNav = (href) => {
     setMenuOpen(false);
@@ -60,9 +60,9 @@ export default function Navbar() {
             {/* LEFT LINKS (desktop) */}
             <div className="hidden items-center gap-1 md:flex">
               {NAV_LINKS.slice(0, 2).map((link) => (
-                <a key={link.href} href={link.href} className={linkClass}>
+                <a key={link.href}  href={link.href} className={linkClass}>
                   {link.label}
-                  <span className="absolute bottom-1 left-4 right-4 h-px origin-left scale-x-0 bg-[#c9a15a] transition-transform duration-300 group-hover:scale-x-100" />
+                  <span className="absolute bottom-1  left-4 right-4 h-px origin-left scale-x-0 bg-[#c9a15a] transition-transform duration-300 group-hover:scale-x-100" />
                 </a>
               ))}
             </div>
@@ -140,7 +140,7 @@ export default function Navbar() {
               style={{
                 transitionDelay: menuOpen ? `${i * 60 + 100}ms` : "0ms",
               }}
-              className={`amc-display px-6 py-3 text-4xl uppercase tracking-wide text-white/80 transition-all duration-500 ease-out hover:text-[#c9a15a] ${
+              className={`amc-display px-6 py-3  text-4xl uppercase tracking-wide text-white/80 transition-all duration-500 ease-out hover:text-[#c9a15a] ${
                 menuOpen
                   ? "translate-y-0 opacity-100"
                   : "translate-y-6 opacity-0"
