@@ -22,6 +22,11 @@ export default function ManageProjects() {
   const [editPreview, setEditPreview] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
 
+  // Get media URL
+  const getMediaUrl = (path) => {
+    return `${import.meta.env.VITE_MEDIA_ENDPOINT}/${path}`;
+  };
+
   // Fetch projects and categories
   const fetchData = async () => {
     try {
@@ -110,31 +115,27 @@ export default function ManageProjects() {
       setEditLoading(true);
       const formData = new FormData();
       
-      // Add all form fields
       formData.append("title", editForm.title);
       formData.append("description", editForm.description);
       formData.append("category_id", editForm.category_id);
       formData.append("is_video", editForm.is_video ? "1" : "0");
       
-      // Add file if a new one is selected
       if (editFile) {
         formData.append("file", editFile);
       }
       
-      // Send PUT request (Laravel supports PUT for updates)
       const response = await axios.post(
         `${import.meta.env.VITE_API_ENDPOINT}/projects/${editingProject.id}`,
         formData,
         {
           headers: { 
             "Content-Type": "multipart/form-data",
-            "X-HTTP-Method-Override": "PUT" // Some Laravel setups need this
+            "X-HTTP-Method-Override": "PUT"
           },
           timeout: 300000,
         }
       );
       
-      // Update the project in the list
       setProjects(projects.map(p => 
         p.id === editingProject.id ? response.data.project : p
       ));
@@ -235,13 +236,13 @@ export default function ManageProjects() {
               <div className="relative aspect-video bg-gray-900">
                 {project.is_video ? (
                   <video
-                    src={`${import.meta.env.VITE_API_ENDPOINT}/storage/${project.path}`}
+                    src={getMediaUrl(project.path)}
                     controls
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <img
-                    src={`${import.meta.env.VITE_API_ENDPOINT}/storage/${project.path}`}
+                    src={getMediaUrl(project.path)}
                     alt={project.title}
                     className="w-full h-full object-cover"
                   />
@@ -406,13 +407,13 @@ export default function ManageProjects() {
                 <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2">
                   {editingProject.is_video ? (
                     <video
-                      src={`${import.meta.env.VITE_API_ENDPOINT}/storage/${editingProject.path}`}
+                      src={getMediaUrl(editingProject.path)}
                       controls
                       className="w-full max-h-48 object-contain"
                     />
                   ) : (
                     <img
-                      src={`${import.meta.env.VITE_API_ENDPOINT}/storage/${editingProject.path}`}
+                      src={getMediaUrl(editingProject.path)}
                       alt={editingProject.title}
                       className="w-full max-h-48 object-contain"
                     />
