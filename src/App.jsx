@@ -12,6 +12,7 @@ import Signup from "./Signup";
 import Contact from "./Contact";
 import Footer from "./Footer";
 import Showreel from "./Showreel";
+import AdminManageProjects from "../src/admin/ManageProjects";
 
 function HomePage() {
   return (
@@ -35,6 +36,7 @@ function App() {
               <Route index element={<AdminAddProject />} />
               <Route path="add-category" element={<AddCategory />} />
               <Route path="add-project" element={<AdminAddProject />} />
+              <Route path="manage-projects" element={<AdminManageProjects />} />
             </Route>
             <Route path="/login" element={<Login/>} />
             <Route path="/signup" element={<Signup/>} />
