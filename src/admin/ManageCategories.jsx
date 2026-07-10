@@ -1,7 +1,7 @@
 // src/components/ManageCategories.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useRef } from "react";
 export default function ManageCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
