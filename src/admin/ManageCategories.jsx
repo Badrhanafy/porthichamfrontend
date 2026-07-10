@@ -329,15 +329,7 @@ export default function ManageCategories() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="bg-[#141414]/80 px-6 py-8 sm:px-8 rounded-2xl mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-          Manage Categories
-        </h2>
-        <p className="text-purple-100 mt-2 text-sm sm:text-base">
-          Create, edit, and organize your project categories
-        </p>
-      </div>
+      
 
       {/* Create Category Form */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
