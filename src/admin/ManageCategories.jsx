@@ -1,6 +1,7 @@
-// src/components/ManageCategories.jsx
+// src/components/ManageCategories.jsx (Updated with modal)
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import CategoryProjectModal from "./CategoryProjectModal";
 
 export default function ManageCategories() {
   const [categories, setCategories] = useState([]);
@@ -9,6 +10,8 @@ export default function ManageCategories() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -189,6 +192,18 @@ export default function ManageCategories() {
       console.error("Error deleting category:", err);
       alert("❌ Failed to delete category: " + (err.response?.data?.message || err.message));
     }
+  };
+
+  // Handle project added
+  const handleProjectAdded = (newProject) => {
+    // Refresh categories to update project counts
+    fetchCategories();
+  };
+
+  // Open project modal
+  const openProjectModal = (category) => {
+    setSelectedCategory(category);
+    setShowProjectModal(true);
   };
 
   // Format date
@@ -390,19 +405,33 @@ export default function ManageCategories() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col gap-2 mt-2">
+                  {/* Add Project Button - Creative & Prominent */}
                   <button
-                    onClick={() => openEditModal(category)}
-                    className="flex-1 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50 rounded-lg transition-colors"
+                    onClick={() => openProjectModal(category)}
+                    className="w-full px-3 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                   >
-                    Edit
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Project to {category.name}
                   </button>
-                  <button
-                    onClick={() => setDeleteConfirm(category.id)}
-                    className="flex-1 px-3 py-2 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg transition-colors"
-                  >
-                    Delete
-                  </button>
+                  
+                  {/* Edit & Delete Row */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEditModal(category)}
+                      className="flex-1 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50 rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirm(category.id)}
+                      className="flex-1 px-3 py-2 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -568,6 +597,17 @@ export default function ManageCategories() {
           </div>
         </div>
       )}
+
+      {/* Category Project Modal */}
+      <CategoryProjectModal
+        isOpen={showProjectModal}
+        onClose={() => {
+          setShowProjectModal(false);
+          setSelectedCategory(null);
+        }}
+        category={selectedCategory}
+        onProjectAdded={handleProjectAdded}
+      />
     </div>
   );
 }

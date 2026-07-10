@@ -13,6 +13,7 @@ import Contact from "./Contact";
 import Footer from "./Footer";
 import Showreel from "./Showreel";
 import AdminManageProjects from "../src/admin/ManageProjects";
+import ManageCategories from "./admin/ManageCategories";
 
 function HomePage() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="add-category" element={<AddCategory />} />
               <Route path="add-project" element={<AdminAddProject />} />
               <Route path="manage-projects" element={<AdminManageProjects />} />
+              <Route path="manage-categories" element={<ManageCategories />} />
             </Route>
             <Route path="/login" element={<Login/>} />
             <Route path="/signup" element={<Signup/>} />
