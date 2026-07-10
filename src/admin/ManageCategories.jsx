@@ -1,7 +1,6 @@
-// src/components/ManageCategories.jsx (Updated with modal)
-import React, { useState, useEffect } from "react";
+// src/components/ManageCategories.jsx
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import CategoryProjectModal from "./CategoryProjectModal";
 
 export default function ManageCategories() {
   const [categories, setCategories] = useState([]);
@@ -10,10 +9,21 @@ export default function ManageCategories() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [expandedCategory, setExpandedCategory] = useState(null); // Track which category is expanded for adding project
+  
+  // Project form states (inline)
+  const [projectForm, setProjectForm] = useState({
+    title: "",
+    description: "",
+  });
+  const [projectFile, setProjectFile] = useState(null);
+  const [isVideo, setIsVideo] = useState(false);
+  const [projectPreview, setProjectPreview] = useState(null);
+  const [projectSubmitting, setProjectSubmitting] = useState(false);
+  const [projectError, setProjectError] = useState("");
+  const fileInputRef = useRef(null);
 
-  // Form states
+  // Category form states
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -47,7 +57,7 @@ export default function ManageCategories() {
     fetchCategories();
   }, []);
 
-  // Handle input changes
+  // Handle category input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -77,7 +87,7 @@ export default function ManageCategories() {
     setCoverPreview(objectUrl);
   };
 
-  // Reset form
+  // Reset category form
   const resetForm = () => {
     setFormData({ name: "", description: "" });
     setCoverFile(null);
@@ -194,16 +204,109 @@ export default function ManageCategories() {
     }
   };
 
-  // Handle project added
-  const handleProjectAdded = (newProject) => {
-    // Refresh categories to update project counts
-    fetchCategories();
+  // --- Project Form Handlers (Inline) ---
+  
+  const handleProjectInputChange = (e) => {
+    const { name, value } = e.target;
+    setProjectForm(prev => ({ ...prev, [name]: value }));
+    if (projectError) setProjectError("");
   };
 
-  // Open project modal
-  const openProjectModal = (category) => {
-    setSelectedCategory(category);
-    setShowProjectModal(true);
+  const handleProjectFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "video/quicktime"];
+    if (!validTypes.includes(file.type)) {
+      setProjectError("Please select a valid image or video file");
+      setProjectFile(null);
+      setIsVideo(false);
+      setProjectPreview(null);
+      return;
+    }
+
+    if (file.size > 300 * 1024 * 1024) {
+      setProjectError("File size must be less than 300MB");
+      return;
+    }
+
+    setProjectError("");
+    setProjectFile(file);
+    const isVideoFile = file.type.startsWith("video/");
+    setIsVideo(isVideoFile);
+    const objectUrl = URL.createObjectURL(file);
+    setProjectPreview(objectUrl);
+  };
+
+  const resetProjectForm = (categoryId) => {
+    setProjectForm({ title: "", description: "" });
+    setProjectFile(null);
+    setIsVideo(false);
+    if (projectPreview) URL.revokeObjectURL(projectPreview);
+    setProjectPreview(null);
+    setProjectError("");
+    setExpandedCategory(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const toggleProjectForm = (categoryId) => {
+    if (expandedCategory === categoryId) {
+      resetProjectForm(categoryId);
+    } else {
+      setExpandedCategory(categoryId);
+      setProjectForm({ title: "", description: "" });
+      setProjectFile(null);
+      setIsVideo(false);
+      if (projectPreview) URL.revokeObjectURL(projectPreview);
+      setProjectPreview(null);
+      setProjectError("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleProjectSubmit = async (e, categoryId) => {
+    e.preventDefault();
+
+    if (!projectForm.title.trim()) {
+      setProjectError("Project title is required");
+      return;
+    }
+    if (!projectFile) {
+      setProjectError("Please select a file (image or video)");
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("title", projectForm.title.trim());
+    formDataToSend.append("description", projectForm.description.trim());
+    formDataToSend.append("file", projectFile);
+    formDataToSend.append("is_video", isVideo ? "1" : "0");
+    formDataToSend.append("category_id", categoryId);
+
+    try {
+      setProjectSubmitting(true);
+      setProjectError("");
+
+      await axios.post(
+        `${import.meta.env.VITE_API_ENDPOINT}/projects`,
+        formDataToSend,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 300000,
+        }
+      );
+
+      alert(`✅ Project "${projectForm.title}" added successfully!`);
+      resetProjectForm(categoryId);
+      fetchCategories(); // Refresh to update project count
+    } catch (err) {
+      console.error("Upload error:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Failed to upload project";
+      setProjectError(errorMsg);
+      alert(`❌ Error: ${errorMsg}`);
+    } finally {
+      setProjectSubmitting(false);
+    }
   };
 
   // Format date
@@ -249,7 +352,6 @@ export default function ManageCategories() {
           </h3>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Category Name <span className="text-red-500">*</span>
@@ -264,8 +366,6 @@ export default function ManageCategories() {
                   required
                 />
               </div>
-
-              {/* Cover Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Cover Image (Optional)
@@ -281,8 +381,6 @@ export default function ManageCategories() {
                 </p>
               </div>
             </div>
-
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description (Optional)
@@ -296,22 +394,14 @@ export default function ManageCategories() {
                 placeholder="Describe what this category represents..."
               />
             </div>
-
-            {/* Preview */}
             {coverPreview && (
               <div className="mt-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cover Preview:</p>
                 <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 max-w-xs">
-                  <img
-                    src={coverPreview}
-                    alt="Cover Preview"
-                    className="w-full h-32 object-cover"
-                  />
+                  <img src={coverPreview} alt="Cover Preview" className="w-full h-32 object-cover" />
                 </div>
               </div>
             )}
-
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={submitting}
@@ -344,10 +434,7 @@ export default function ManageCategories() {
             </div>
             <div className="ml-3">
               <p className="text-sm text-red-700 dark:text-red-200">{error}</p>
-              <button
-                onClick={fetchCategories}
-                className="mt-2 text-sm font-medium text-red-700 dark:text-red-200 hover:text-red-600 underline"
-              >
+              <button onClick={fetchCategories} className="mt-2 text-sm font-medium text-red-700 dark:text-red-200 hover:text-red-600 underline">
                 Try again
               </button>
             </div>
@@ -364,78 +451,197 @@ export default function ManageCategories() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-            >
-              {/* Cover Image */}
-              <div className="relative h-40 bg-gradient-to-r from-purple-500 to-pink-500">
-                {category.coverpath ? (
-                  <img
-                    src={getMediaUrl(category.coverpath)}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <span className="text-6xl opacity-50">🏷️</span>
+          {categories.map((category) => {
+            const isExpanded = expandedCategory === category.id;
+            return (
+              <div
+                key={category.id}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
+                {/* Cover Image */}
+                <div className="relative h-40 bg-gradient-to-r from-purple-500 to-pink-500">
+                  {category.coverpath ? (
+                    <img
+                      src={getMediaUrl(category.coverpath)}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="text-6xl opacity-50">🏷️</span>
+                    </div>
+                  )}
+                  <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                    {category.projects?.length || 0} projects
                   </div>
-                )}
-                <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                  {category.projects?.length || 0} projects
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {category.name}
-                  </h3>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDate(category.created_at)}
-                  </span>
                 </div>
 
-                {category.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
-                    {category.description}
-                  </p>
-                )}
+                {/* Content */}
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {category.name}
+                    </h3>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {formatDate(category.created_at)}
+                    </span>
+                  </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 mt-2">
-                  {/* Add Project Button - Creative & Prominent */}
-                  <button
-                    onClick={() => openProjectModal(category)}
-                    className="w-full px-3 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add Project to {category.name}
-                  </button>
-                  
-                  {/* Edit & Delete Row */}
+                  {category.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                      {category.description}
+                    </p>
+                  )}
+
+                  {/* Action Buttons */}
                   <div className="flex gap-2">
+                    {/* Plus Icon Button - Toggle Project Form */}
+                    <button
+                      onClick={() => toggleProjectForm(category.id)}
+                      className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+                        isExpanded
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50'
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg'
+                      }`}
+                    >
+                      <svg 
+                        className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-45' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      {isExpanded ? 'Cancel' : `Add Project`}
+                    </button>
+
+                    {/* Edit Button */}
                     <button
                       onClick={() => openEditModal(category)}
-                      className="flex-1 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50 rounded-lg transition-colors"
+                      className="px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50 rounded-lg transition-colors"
                     >
-                      Edit
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                     </button>
+
+                    {/* Delete Button */}
                     <button
                       onClick={() => setDeleteConfirm(category.id)}
-                      className="flex-1 px-3 py-2 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg transition-colors"
+                      className="px-3 py-2 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg transition-colors"
                     >
-                      Delete
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                     </button>
                   </div>
+
+                  {/* Inline Project Form (Conditional) */}
+                  {isExpanded && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 animate-slideDown">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        Add Project to "{category.name}"
+                      </h4>
+                      
+                      {projectError && (
+                        <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-3 rounded-md mb-3">
+                          <p className="text-sm text-red-700 dark:text-red-200">{projectError}</p>
+                        </div>
+                      )}
+
+                      <form onSubmit={(e) => handleProjectSubmit(e, category.id)} className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Title <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="title"
+                            value={projectForm.title}
+                            onChange={handleProjectInputChange}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition"
+                            placeholder="Project title"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Description
+                          </label>
+                          <textarea
+                            name="description"
+                            value={projectForm.description}
+                            onChange={handleProjectInputChange}
+                            rows="2"
+                            className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition"
+                            placeholder="Brief description..."
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Media File <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*,video/*"
+                            onChange={handleProjectFileChange}
+                            className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            PNG, JPG, GIF, WEBP, MP4, WEBM (Max 300MB)
+                          </p>
+                        </div>
+
+                        {projectPreview && (
+                          <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2">
+                            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Preview:</p>
+                            {isVideo ? (
+                              <video src={projectPreview} controls className="w-full max-h-32 rounded object-contain" />
+                            ) : (
+                              <img src={projectPreview} alt="Preview" className="w-full max-h-32 object-contain rounded" />
+                            )}
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                              {projectFile?.name} ({(projectFile?.size / (1024 * 1024)).toFixed(2)} MB)
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={projectSubmitting}
+                            className="flex-1 flex justify-center items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {projectSubmitting ? (
+                              <>
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Uploading...
+                              </>
+                            ) : (
+                              'Add Project'
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleProjectForm(category.id)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -489,7 +695,6 @@ export default function ManageCategories() {
             </div>
 
             <form onSubmit={handleUpdate} className="space-y-4">
-              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Category Name <span className="text-red-500">*</span>
@@ -504,7 +709,6 @@ export default function ManageCategories() {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Description
@@ -518,7 +722,6 @@ export default function ManageCategories() {
                 />
               </div>
 
-              {/* Current Cover */}
               {editingCategory.coverpath && !coverFile && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -534,7 +737,6 @@ export default function ManageCategories() {
                 </div>
               )}
 
-              {/* New Cover Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Replace Cover (Optional)
@@ -547,23 +749,17 @@ export default function ManageCategories() {
                 />
               </div>
 
-              {/* New Cover Preview */}
               {coverPreview && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     New Cover Preview
                   </label>
                   <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 max-w-xs">
-                    <img
-                      src={coverPreview}
-                      alt="New Cover Preview"
-                      className="w-full h-32 object-cover"
-                    />
+                    <img src={coverPreview} alt="New Cover Preview" className="w-full h-32 object-cover" />
                   </div>
                 </div>
               )}
 
-              {/* Buttons */}
               <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
@@ -597,17 +793,6 @@ export default function ManageCategories() {
           </div>
         </div>
       )}
-
-      {/* Category Project Modal */}
-      <CategoryProjectModal
-        isOpen={showProjectModal}
-        onClose={() => {
-          setShowProjectModal(false);
-          setSelectedCategory(null);
-        }}
-        category={selectedCategory}
-        onProjectAdded={handleProjectAdded}
-      />
     </div>
   );
 }
