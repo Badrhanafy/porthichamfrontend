@@ -92,31 +92,27 @@ const navItems = [
 
         <nav className="flex-1 space-y-2 p-4">
 
-          {navItems.map((item) => (
+         {navItems.map((item) => {
+  const Icon = item.icon;
 
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `
-                  flex items-center gap-3 rounded-xl px-4 py-3 transition
-
-                  ${
-                    isActive
-                      ? "border border-purple-500/20 bg-purple-500/10 text-purple-400"
-                      : "text-white/60 hover:bg-white/5 hover:text-white"
-                  }
-                `
-              }
-            >
-              <span className="flex-shrink-0">{item.icon}</span>
-
-              <span>{item.label}</span>
-
-            </NavLink>
-
-          ))}
+  return (
+    <NavLink
+      key={item.path}
+      to={item.path}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-xl px-4 py-3 transition ${
+          isActive
+            ? "border border-purple-500/20 bg-purple-500/10 text-purple-400"
+            : "text-white/60 hover:bg-white/5 hover:text-white"
+        }`
+      }
+    >
+      <Icon size={20} strokeWidth={2} />
+      <span>{item.label}</span>
+    </NavLink>
+  );
+})}
 
         </nav>
 
