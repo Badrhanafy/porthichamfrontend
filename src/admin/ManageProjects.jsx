@@ -1,6 +1,7 @@
 // src/components/ManageProjects.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import AddProjectModal from "../components/AddProjectModal"; // We'll create this
 
 export default function ManageProjects() {
   const [projects, setProjects] = useState([]);
@@ -10,6 +11,7 @@ export default function ManageProjects() {
   const [categories, setCategories] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false); // New state for add modal
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -166,6 +168,12 @@ export default function ManageProjects() {
     });
   };
 
+  // Handle successful project addition
+  const handleProjectAdded = (newProject) => {
+    setProjects(prev => [newProject, ...prev]);
+    setShowAddModal(false);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -209,12 +217,25 @@ export default function ManageProjects() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="bg-[#141414]/80 px-6 py-8 sm:px-8 rounded-2xl mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-          Manage Projects
-        </h2>
-        <p className="text-blue-100 mt-2 text-sm sm:text-base">
-          View, edit, and remove your projects
-        </p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Manage Projects
+            </h2>
+            <p className="text-blue-100 mt-2 text-sm sm:text-base">
+              View, edit, and remove your projects
+            </p>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add New Project
+          </button>
+        </div>
       </div>
 
       {/* Projects Grid */}
@@ -224,6 +245,15 @@ export default function ManageProjects() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
           <p className="mt-4 text-gray-600 dark:text-gray-400">No projects found. Create your first project!</p>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Your First Project
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -300,6 +330,15 @@ export default function ManageProjects() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Add Project Modal */}
+      {showAddModal && (
+        <AddProjectModal
+          onClose={() => setShowAddModal(false)}
+          onProjectAdded={handleProjectAdded}
+          categories={categories}
+        />
       )}
 
       {/* Delete Confirmation Modal */}

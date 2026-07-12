@@ -8,11 +8,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
     label: "Add Project",
     icon: "📝",
   },
-  /* {
+  {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/manage-projects",
     label: "Manage Projects",
     icon: "📋",
-  }, */
+  },
   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/manage-categories",
     label: "Manage Categories",
