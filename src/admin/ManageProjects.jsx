@@ -307,7 +307,7 @@ export default function ManageProjects() {
 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                    {getCategoryName(project.category.id)}
+                    {getCategoryName(project.category_id)}
                   </span>
                 </div>
 
