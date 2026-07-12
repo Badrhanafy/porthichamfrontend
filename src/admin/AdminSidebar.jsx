@@ -8,11 +8,11 @@ import {
 export default function AdminSidebar({ isOpen, onClose }) {
 
 const navItems = [
-  {
+/*   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/add-project",
     label: "Add Project",
     icon: FolderPlus,
-  },
+  }, */
   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/manage-projects",
     label: "Manage Projects",
