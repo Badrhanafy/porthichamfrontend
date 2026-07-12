@@ -1,28 +1,28 @@
 import { NavLink } from "react-router-dom";
-
+import {
+  FolderPlus,
+  FolderOpen,
+  LayoutGrid,
+  X,
+} from "lucide-react";
 export default function AdminSidebar({ isOpen, onClose }) {
 
- const navItems = [
+const navItems = [
   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/add-project",
     label: "Add Project",
-    icon: "📝",
+    icon: FolderPlus,
   },
   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/manage-projects",
     label: "Manage Projects",
-    icon: "📋",
+    icon: FolderOpen,
   },
   {
     path: "/adminspcaeforuploadmediav1_notsecuredatall/manage-categories",
     label: "Manage Categories",
-    icon: "🏷️",
+    icon: LayoutGrid,
   },
-/*   {
-    path: "/adminspcaeforuploadmediav1_notsecuredatall/add-category",
-    label: "Add Category",
-    icon: "🏷️",
-  }, */
 ];
 
   return (
