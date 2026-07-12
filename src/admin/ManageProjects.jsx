@@ -156,7 +156,7 @@ export default function ManageProjects() {
   // Get category name by id
   const getCategoryName = (categoryId) => {
     const category = categories.find(c => c.id === categoryId);
-    return category ? category.name : "Uncategorized";
+    return category.name || "Uncategorized";
   };
 
   // Format date
